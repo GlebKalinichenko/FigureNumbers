@@ -28,6 +28,7 @@ public class BitmapHelper {
     List<int[][]> innerMatrix = new ArrayList<>();
     private int innerAngle = 0;
     private int outherAngle = 0;
+    private int label = 0;
     private static BitmapHelper instance = null;
 
     public static BitmapHelper getInstance() {
@@ -48,7 +49,6 @@ public class BitmapHelper {
 
     public void getMarkers(int[][] pixels){
         int[][] negPixels = negativePixels(pixels);
-        int label = 0;
         findComponent(negPixels, label);
         Log.d(LOG_TAG, String.valueOf(negPixels));
     }
@@ -66,30 +66,43 @@ public class BitmapHelper {
 
     private void searchComponent(int[][] pixels, int label, int i, int j) {
         pixels[i][j] = label;
-        List<NeighboardSet> nSets = neighboardSets(i, j);
-        for (NeighboardSet set: nSets) {
-            int nI = set.getI();
-            int nJ = set.getJ();
-            if (pixels[nI][nJ] == -1) {
-                nSets.clear();
-                searchComponent(pixels, label, nI, nJ);
+        List<NeighboardSet> nSets = neighboardSets(i, j, pixels);
+        if (nSets.size() != 0) {
+            for (NeighboardSet set : nSets) {
+                int nI = set.getI();
+                int nJ = set.getJ();
+                if (pixels[nI][nJ] == -1) {
+                    searchComponent(pixels, label, nI, nJ);
+                }
             }
+            nSets.clear();
+        }
+        else{
+            Log.d(LOG_TAG, "Size empty");
         }
     }
 
-    private List<NeighboardSet> neighboardSets(int i, int j){
+    private List<NeighboardSet> neighboardSets(int i, int j, int[][] pixels){
         List<NeighboardSet> neighboards = new ArrayList<>();
         if (!((i - 1 == -1) || (j - 1 == -1) || (i + 1 >= IMAGE_WIDTH) || (j + 1 >= IMAGE_HEIGHT))) {
-            neighboards.add(new NeighboardSet(i-1, j-1));
-            neighboards.add(new NeighboardSet(i-1, j));
-            neighboards.add(new NeighboardSet(i-1, j+1));
+            if (pixels[i-1][j-1] == -1)
+                neighboards.add(new NeighboardSet(i-1, j-1));
+            if (pixels[i-1][j] == -1)
+                neighboards.add(new NeighboardSet(i-1, j));
+            if (pixels[i-1][j+1] == -1)
+                neighboards.add(new NeighboardSet(i-1, j+1));
 
-            neighboards.add(new NeighboardSet(i, j-1));
-            neighboards.add(new NeighboardSet(i, j+1));
+            if (pixels[i][j-1] == -1)
+                neighboards.add(new NeighboardSet(i, j-1));
+            if (pixels[i][j+1] == -1)
+                neighboards.add(new NeighboardSet(i, j+1));
 
-            neighboards.add(new NeighboardSet(i+1, j-1));
-            neighboards.add(new NeighboardSet(i+1, j));
-            neighboards.add(new NeighboardSet(i+1, j+1));
+            if (pixels[i+1][j-1] == -1)
+                neighboards.add(new NeighboardSet(i+1, j-1));
+            if (pixels[i+1][j] == -1)
+                neighboards.add(new NeighboardSet(i+1, j));
+            if (pixels[i+1][j+1] == -1)
+                neighboards.add(new NeighboardSet(i+1, j+1));
         }
 
         return neighboards;
