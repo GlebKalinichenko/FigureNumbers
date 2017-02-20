@@ -66,12 +66,14 @@ public class BitmapHelper {
 
     private void searchComponent(int[][] pixels, int label, int i, int j) {
         pixels[i][j] = label;
-        List<NeighboardSet> neighboardSets = neighboardSets(i, j);
-        for (NeighboardSet set: neighboardSets) {
+        List<NeighboardSet> nSets = neighboardSets(i, j);
+        for (NeighboardSet set: nSets) {
             int nI = set.getI();
             int nJ = set.getJ();
-            if (pixels[nI][nJ] == -1)
+            if (pixels[nI][nJ] == -1) {
+                nSets.clear();
                 searchComponent(pixels, label, nI, nJ);
+            }
         }
     }
 
@@ -101,7 +103,7 @@ public class BitmapHelper {
                 if (pixels[i][j] == 0)
                     resPixels[i][j] = -1;
                 else
-                    resPixels[i][j] = pixels[i][j];
+                    resPixels[i][j] = 0;
             }
         }
 
